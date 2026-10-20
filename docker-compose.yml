@@ -1,0 +1,66 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gridmind-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=GridMind AI
+      - DEBUG=false
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - CORS_ORIGINS=["http://localhost:5173","http://localhost:3000","http://frontend:5173"]
+      - DATABASE_URL=sqlite:///./gridmind.db
+      - DATA_DIR=/app/data
+      - MODELS_DIR=/app/models
+      - EXPERIMENTS_DIR=/app/experiments
+      - GRIDMIND_API_KEY=${GRIDMIND_API_KEY:-dev-secret-change-in-production}
+      - RANDOM_SEED=42
+    volumes:
+      - backend_data:/app/data
+      - backend_models:/app/models
+      - backend_experiments:/app/experiments
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - gridmind-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_KEY: ${GRIDMIND_API_KEY:-dev-secret-change-in-production}
+    container_name: gridmind-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - gridmind-network
+
+volumes:
+  backend_data:
+  backend_models:
+  backend_experiments:
+
+networks:
+  gridmind-network:
+    driver: bridge

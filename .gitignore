@@ -1,0 +1,49 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+/.nyc_output
+
+# Production
+/build
+/dist
+/.env.local
+/.env.development.local
+/.env.test.local
+/.env.production.local
+
+# Logs
+*.log
+runtime-data/
+
+# Backend
+backend/__pycache__
+backend/*.py[cod]
+backend/*$py.class
+backend/venv/
+backend/ENV/
+backend/env/
+backend/.env
+backend.egg-info/
+backend/dist/
+backend/build/
+backend/*.log
+backend/data/
+backend/models/
+backend/experiments/
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# OS
+.DS_Store
+Thumbs.db
